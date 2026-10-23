@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if filme %}{{ filme.Title }} - {% endif %}CineBusca</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+
+  <header class="cabecalho cabecalho-simples">
+    <a href="{% url 'buscar_filmes' %}" class="marca">🎬 CineBusca</a>
+  </header>
+
+  <main class="conteudo">
+
+    <a class="voltar" href="{% url 'buscar_filmes' %}{% if voltar %}?q={{ voltar|urlencode }}{% endif %}">‹ Voltar para a busca</a>
+
+    {% if erro %}
+      <p class="mensagem mensagem-erro">{{ erro }}</p>
+    {% else %}
+      <article class="detalhe">
+        {% if filme.Poster != "N/A" %}
+          <img class="detalhe-poster" src="{{ filme.Poster }}" alt="Pôster de {{ filme.Title }}">
+        {% else %}
+          <div class="detalhe-poster sem-poster">Sem pôster</div>
+        {% endif %}
+
+        <div class="detalhe-info">
+          <h1>{{ filme.Title }} <span class="ano">({{ filme.Year }})</span></h1>
+
+          <div class="etiquetas">
+            {% if filme.Rated != "N/A" %}<span>{{ filme.Rated }}</span>{% endif %}
+            {% if filme.Runtime != "N/A" %}<span>{{ filme.Runtime }}</span>{% endif %}
+            {% if filme.Genre != "N/A" %}<span>{{ filme.Genre }}</span>{% endif %}
+          </div>
+
+          {% if filme.imdbRating != "N/A" %}
+            <p class="nota">⭐ {{ filme.imdbRating }}/10 <small>no IMDb</small></p>
+          {% endif %}
+
+          <p class="sinopse">{{ filme.Plot }}</p>
+
+          <dl class="ficha">
+            <dt>Direção</dt>
+            <dd>{{ filme.Director }}</dd>
+            <dt>Elenco</dt>
+            <dd>{{ filme.Actors }}</dd>
+            <dt>Lançamento</dt>
+            <dd>{{ filme.Released }}</dd>
+            <dt>Idioma</dt>
+            <dd>{{ filme.Language }}</dd>
+          </dl>
+        </div>
+      </article>
+    {% endif %}
+
+  </main>
+
+  <footer class="rodape">Dados fornecidos pela API do OMDb</footer>
+
+</body>
+
+</html>

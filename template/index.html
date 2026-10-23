@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineBusca</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+
+  <header class="cabecalho">
+    <a href="{% url 'buscar_filmes' %}" class="marca">🎬 CineBusca</a>
+    <p class="subtitulo">Pesquise filmes usando a API do OMDb</p>
+
+    <form class="busca" method="get" action="{% url 'buscar_filmes' %}">
+      <input type="search" name="q" value="{{ termo }}" placeholder="Ex.: Batman, Toy Story, Matrix..." aria-label="Nome do filme">
+      <button type="submit">Buscar</button>
+    </form>
+  </header>
+
+  <main class="conteudo">
+
+    {% if erro %}
+      <p class="mensagem mensagem-erro">{{ erro }}</p>
+
+    {% elif not termo %}
+      <p class="mensagem">Digite o nome de um filme para começar.</p>
+
+    {% else %}
+      <p class="resultado">{{ total }} resultado{{ total|pluralize }} para “{{ termo }}” · página {{ pagina }}</p>
+
+      <div class="lista-filmes">
+        {% for filme in filmes %}
+          <a class="card-filme" href="{% url 'detalhe_filme' filme.imdbID %}?q={{ termo|urlencode }}">
+            {% if filme.Poster != "N/A" %}
+              <img src="{{ filme.Poster }}" alt="Pôster de {{ filme.Title }}" loading="lazy">
+            {% else %}
+              <div class="sem-poster">Sem pôster</div>
+            {% endif %}
+            <h2>{{ filme.Title }}</h2>
+            <span class="ano">{{ filme.Year }}</span>
+          </a>
+        {% endfor %}
+      </div>
+
+      {% if pagina_anterior or proxima_pagina %}
+        <nav class="paginacao">
+          {% if pagina_anterior %}
+            <a href="?q={{ termo|urlencode }}&page={{ pagina_anterior }}">‹ Anterior</a>
+          {% endif %}
+          {% if proxima_pagina %}
+            <a href="?q={{ termo|urlencode }}&page={{ proxima_pagina }}">Próxima ›</a>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% endif %}
+
+  </main>
+
+  <footer class="rodape">Dados fornecidos pela API do OMDb</footer>
+
+</body>
+
+</html>
