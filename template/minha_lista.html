@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha lista - CineBusca</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+
+  <header class="cabecalho cabecalho-simples cabecalho-nav">
+    <a href="{% url 'buscar_filmes' %}" class="marca">🎬 CineBusca</a>
+    <nav class="menu">
+      <a href="{% url 'buscar_filmes' %}">Buscar</a>
+      <a href="{% url 'minha_lista' %}" class="ativo">Minha lista</a>
+    </nav>
+  </header>
+
+  <main class="conteudo">
+
+    <div class="topo-lista">
+      <div>
+        <h1>Minha lista</h1>
+        <p class="resultado">{{ total }} filme{{ total|pluralize }} salvo{{ total|pluralize }}</p>
+      </div>
+
+      <nav class="filtros">
+        <a href="{% url 'minha_lista' %}" class="{% if not filtro %}ativo{% endif %}">Todos</a>
+        <a href="?filtro=quero-ver" class="{% if filtro == 'quero-ver' %}ativo{% endif %}">Quero ver</a>
+        <a href="?filtro=assistidos" class="{% if filtro == 'assistidos' %}ativo{% endif %}">Assistidos</a>
+      </nav>
+    </div>
+
+    <div class="lista-salvos">
+      {% for filme in filmes %}
+        <article class="salvo">
+          {% if filme.poster %}
+            <img src="{{ filme.poster }}" alt="Pôster de {{ filme.titulo }}" loading="lazy">
+          {% else %}
+            <div class="sem-poster">Sem pôster</div>
+          {% endif %}
+
+          <div class="salvo-info">
+            <h2>{{ filme.titulo }}{% if filme.ano %} <span class="ano">({{ filme.ano }})</span>{% endif %}</h2>
+            {% if filme.diretor %}<p class="salvo-diretor">{{ filme.diretor }}</p>{% endif %}
+
+            <div class="etiquetas">
+              {% if filme.assistido %}<span class="etiqueta-ok">✔ Assistido</span>{% else %}<span>Quero ver</span>{% endif %}
+              {% if filme.nota is not None %}<span>⭐ {{ filme.nota }}/10</span>{% endif %}
+            </div>
+
+            <div class="salvo-acoes">
+              {% if filme.imdb_id %}<a href="{% url 'detalhe_filme' filme.imdb_id %}">Detalhes</a>{% endif %}
+              <a href="{% url 'editar_filme' filme.id %}">Editar</a>
+              <a href="{% url 'remover_filme' filme.id %}" class="acao-remover">Remover</a>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <p class="mensagem">Nenhum filme por aqui. Busque um filme e clique em “Salvar na minha lista”, ou cadastre abaixo.</p>
+      {% endfor %}
+    </div>
+
+    <section class="caixa">
+      <h2>Adicionar filme à mão</h2>
+      <form method="post" class="formulario">
+        {% csrf_token %}
+        {{ form.as_div }}
+        <button type="submit" class="botao">Adicionar</button>
+      </form>
+    </section>
+
+  </main>
+
+  <footer class="rodape">Dados fornecidos pela API do OMDb</footer>
+
+</body>
+
+</html>

@@ -11,8 +11,12 @@
 
 <body>
 
-  <header class="cabecalho cabecalho-simples">
+  <header class="cabecalho cabecalho-simples cabecalho-nav">
     <a href="{% url 'buscar_filmes' %}" class="marca">🎬 CineBusca</a>
+    <nav class="menu">
+      <a href="{% url 'buscar_filmes' %}">Buscar</a>
+      <a href="{% url 'minha_lista' %}">Minha lista</a>
+    </nav>
   </header>
 
   <main class="conteudo">
@@ -43,6 +47,15 @@
           {% endif %}
 
           <p class="sinopse">{{ filme.Plot }}</p>
+
+          {% if salvo %}
+            <p class="ja-salvo">✔ Já está na sua lista · <a href="{% url 'editar_filme' salvo.id %}">editar</a></p>
+          {% else %}
+            <form method="post" action="{% url 'salvar_da_api' imdb_id %}">
+              {% csrf_token %}
+              <button type="submit" class="botao">+ Salvar na minha lista</button>
+            </form>
+          {% endif %}
 
           <dl class="ficha">
             <dt>Direção</dt>
